@@ -1,6 +1,5 @@
 import express from "express";
 import morgan from "morgan";
-import nunjucks from "nunjucks";
 import graphql from "express-graphql";
 
 import { sequelize } from "./models/index.js";
@@ -11,11 +10,6 @@ import verify from "./middlewares/auth.js";
 const app = express();
 
 app.set("port", 1000);
-app.set("view engine", "html");
-nunjucks.configure("views", {
-  express: app,
-  watch: true,
-});
 sequelize
   .sync()
   // .sync({ force: true })
@@ -27,7 +21,7 @@ sequelize
 //     return res.sendStatus(200);
 //   }
 //   next();
-// }); 
+// });
 
 app.use(verify);
 
@@ -46,9 +40,5 @@ app.use("/graphql", graphql({
     return { message: message, status: code, data: data };
   },
 }));
-
-app.use("/", (req, res, next) => {
-  return res.render("index");
-});
 
 app.listen(app.get("port"), () => console.log(1000));

@@ -44,7 +44,7 @@ export default {
       }
   },
   login: async function({ email, password }, req) {
-    if (!req.isAuth) return errorHandler("Test error", 404);
+    // if (!req.isAuth) return errorHandler("Test error", 404);
     const exist = await User.findOne({ where: { email }});
     if (!exist) return errorHandler("User not found", 404);
     const result = await bcrypt.compare(password, exist.password);
