@@ -14,7 +14,14 @@ const resolvers = [
   types.resolver,
 ];
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  cache: "bounded",
+  formatError: (err) => {
+    console.log(err);
+  },
+});
 
 server.listen()
   .then(({ url }) => console.log(url));
