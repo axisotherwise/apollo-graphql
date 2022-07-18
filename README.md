@@ -1,5 +1,5 @@
 # GraphQL
-쿼리 종류가 다양하며 유연성이 높다  
+쿼리 종류가 다양하며 유연성이
   
 ## query(Operation type)
 데이터를 검색하기 위해 POST 요청  
