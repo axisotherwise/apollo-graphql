@@ -1,22 +1,24 @@
-import express from "express";
-import morgan from "morgan";
+import { ApolloServer } from "apollo-server";
 
-import { sequelize } from "./models/index.js";
+import queries from "./typedefs-resolvers/queries.js";
+import mutations from "./typedefs-resolvers/mutations.js";
+import * as types from "./typedefs-resolvers/user-resolver.js";
 
-const app = express();
+const typeDefs = [
+  queries,
+  mutations,
+  types.resolverTypeDefs,
+];
 
-app.set("port", 1000);
-sequelize
-  .sync()
-  // .sync({ force: true })
-  .then(() => console.log("db connect"))
-  .catch(err => console.error(err));
+const resolvers = [
+  types.resolver,
+];
 
-// app.use((req, res, next) => {
-//   if (req.method === "OPTIONS") {
-//     return res.sendStatus(200);
-//   }
-//   next();
-// });
-
-app.listen(app.get("port"), () => console.log(1000));
+export default new ApolloServer({
+  typeDefs,
+  resolvers,
+  cache: "bounded",
+  formatError: (err) => {
+    console.error(er);
+  },
+});
