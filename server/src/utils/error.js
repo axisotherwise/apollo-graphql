@@ -1,7 +1,7 @@
 const errorHandler = (message, status) => {
   const error = new Error(message);
-  error.code = status;
+  error.status = status;
   throw error;
-}
+};
 
 export default errorHandler;
