@@ -4,6 +4,7 @@ import queries from "./typedefs-resolvers/queries.js";
 import mutations from "./typedefs-resolvers/mutations.js";
 import * as userResolver from "./typedefs-resolvers/user-resolver.js"; 
 import * as postResolver from "./typedefs-resolvers/post-resolver.js";
+import context from "./context/verify.js";
 
 const typeDefs = [
   queries,
@@ -21,6 +22,8 @@ export default new ApolloServer({
   typeDefs,
   resolvers,
   cache: "bounded",
+  tracing: true,
+  context,
   formatError: (err) => {
     if (!err.originalError) return err;
     return {
@@ -29,3 +32,4 @@ export default new ApolloServer({
     };
   },
 });
+

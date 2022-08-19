@@ -1,5 +1,5 @@
 const findUserQuery = `
-  SELECT email
+  SELECT *
   FROM user
   WHERE email = ?
 `;

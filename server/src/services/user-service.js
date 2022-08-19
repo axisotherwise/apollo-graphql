@@ -2,13 +2,15 @@ import db from "../db/index.js";
 
 import * as userQuery from "../queries/user-query.js";
 
+const conn = await db;
+
 const findUser = async (email) => {
   try {
-    const [ findUser ] = await db.query(
+    const [ user ] = await conn.query(
       userQuery.findUserQuery,
-      [ email ],
+      [ email ]
     );
-    return findUser;
+    return user;
   } catch (err) {
     console.error(err);
   }
@@ -16,8 +18,8 @@ const findUser = async (email) => {
 
 const createUser = async (email, name, password) => {
   try {
-    const [ user ] = await db.query(
-      userQuery.createUserQuery, 
+    const [ user ] = await conn.query(
+      userQuery.createUserQuery,
       [ email, name, password ]
     );
     return user;
@@ -28,11 +30,11 @@ const createUser = async (email, name, password) => {
 
 const createUserDetail = async (gender, address, userId) => {
   try {
-    const [ userDetail ] = await db.query(
+    const [ detail ] = await conn.query(
       userQuery.createUserDetailQuery,
-      [ gender, address, userId ],
+      [ gender, address, userId ]
     );
-    return userDetail;
+    return detail;
   } catch (err) {
     console.error(err);
   }

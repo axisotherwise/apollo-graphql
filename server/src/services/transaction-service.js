@@ -1,10 +1,10 @@
 import db from "../db/index.js";
 
-import { connect } from "../db/index.js";
+const conn = await db;
 
-const transaction = async () => connect.beginTransaction();
-const commit = async () => connect.commit();
-const rollback = async () => connect.rollback();
+const transaction = async () => await conn.beginTransaction();
+const commit = async () => await conn.commit();
+const rollback = async () => await conn.rollback();
 
 export {
   transaction,

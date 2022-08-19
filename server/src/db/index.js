@@ -1,9 +1,9 @@
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const connect = mysql.createPool(
+const connection = mysql.createPool(
   {
     host: process.env.DB_HOST,
     database: process.env.DB,
@@ -15,18 +15,6 @@ const connect = mysql.createPool(
   },
 );
 
-connect.getConnection(async (err, conn) => {
-  try {
-    return conn;
-  } catch (err) {
-    err ? console.error(err) : console.log("db connect");
-  }
-});
-
-const db = connect.promise();
-
-export {
-  connect,
-};
+const db = connection.getConnection();
 
 export default db;

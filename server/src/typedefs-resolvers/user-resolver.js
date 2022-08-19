@@ -1,38 +1,35 @@
 import { gql } from "apollo-server";
 import bcrypt from "bcrypt";
 
-// import {
-//   transaction,
-//   commit,
-//   rollback,
-// } from "../services/transaction-service.js";
-
-import { connect } from "../db/index.js";
-
 import * as userService from "../services/user-service.js";
+import * as t from "../services/transaction-service.js";
 
 import db from "../db/index.js";
 
 const resolverTypeDefs = gql`
   type User {
-    userId: Int!
-    email: String!
+    userId: ID
   }
-
   type UserDetail {
-    userId: Int!
+    userId: ID!
     email: String!
     name: String!
     gender: String!
     address: String!
   }
-
+  type LoginResult {
+    token: String
+  }
   input UserInputData {
     email: String!
     name: String!
     password: String!
     gender: String!
     address: String!
+  }
+  input UserLoginData {
+    email: String
+    password: String
   }
 `;
 
@@ -44,36 +41,49 @@ const resolver =  {
     createUser: async (parent, { userInput }) => {
       try {
         const exist = await userService.findUser(userInput.email);
-        if (exist.length >= 1) {
+        if (exist.length === 1) {
           const error = new Error("이미 가입된 회원입니다.");
           error.status = 418;
           throw error;
         }
         const hash = await bcrypt.hash(userInput.password, 12);
-        await db.query("START TRANSACTION");
-        const [ user ] = await db.query(`
-          INSERT INTO user (email, name, password) VALUES (?, ?, ?)
-        `, [ userInput.email, userInput.name, hash ]);
+        await t.transaction();
+        const user = await userService.createUser(
+          userInput.email,
+          userInput.name,
+          hash,
+        );
         const userId = user.insertId;
-        const [ detail ] = await db.query(`
-          INSERT INTO detail (gender, address, fk_user_id) VALUES (?, ?, ?)
-        `, [ userInput.gender, userInput.address, userId ]);
-        // const user = await userService.createUser(
-        //   userInput.email,
-        //   userInput.name,
-        //   hash,
-        // );
-        // const userId = null;
-        // const userDetail = await userService.createUserDetail(
-        //   userInput.gender,
-        //   userInput.address,
-        //   userId,
-        // );
-        await db.query("COMMIT");
-        console.log("COMMIT 실행됩니다.");
+        const detail = await userService.createUserDetail(
+          userInput.gender,
+          userInput.address,
+          userId,
+        );
+        await t.commit();
+        return [
+          {
+            userId,
+          }
+        ];
       } catch (err) {
-        await db.query("ROLLBACK");
-        console.log("rollback 실행됩니다.");
+        await t.rollback();
+        console.log(err);
+        throw err;
+      }
+    },
+    userLogin: async(parent, { userInput }, context, info) => {
+      console.log(context.token);
+      try {
+        // const exist = await userService.findUser(userInput.email);
+        // if (!exist) {
+        //   const error = new Error("존재하지 않는 회원입니다.");
+        //   error.status = 418;
+        //   throw error;
+        // }
+        // console.log(exist);
+        // const compare = await bcrypt.compare(userInput.password, exist.password);
+        // console.log(compare);
+      } catch (err) {
         console.error(err);
         throw err;
       }
