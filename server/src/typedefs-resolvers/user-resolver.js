@@ -4,28 +4,19 @@ import bcrypt from "bcrypt";
 import * as userService from "../services/user-service.js";
 import * as t from "../services/transaction-service.js";
 
-import db from "../db/index.js";
-
 const resolverTypeDefs = gql`
   type User {
-    userId: ID
-  }
-  type UserDetail {
-    userId: ID!
+    id: Int!
     email: String!
-    name: String!
-    gender: String!
     address: String!
   }
   type LoginResult {
     token: String
   }
   input UserInputData {
-    email: String!
-    name: String!
-    password: String!
-    gender: String!
-    address: String!
+    email: String
+    name: String
+    password: String
   }
   input UserLoginData {
     email: String
@@ -35,10 +26,17 @@ const resolverTypeDefs = gql`
 
 const resolver =  {
   Query: {
-    
+    getUsers: async (parent, input, context, info) => {
+      console.log(context.user);
+      return [
+        {
+          id: 1,
+        },
+      ];
+    },
   },
   Mutation: {
-    createUser: async (parent, { userInput }) => {
+    createUser: async (parent, { userInput }, context, info) => {
       try {
         const exist = await userService.findUser(userInput.email);
         if (exist.length === 1) {
@@ -47,6 +45,7 @@ const resolver =  {
           throw error;
         }
         const hash = await bcrypt.hash(userInput.password, 12);
+        // transaction
         await t.transaction();
         const user = await userService.createUser(
           userInput.email,
@@ -60,6 +59,7 @@ const resolver =  {
           userId,
         );
         await t.commit();
+        // transaction end
         return [
           {
             userId,
@@ -74,15 +74,15 @@ const resolver =  {
     userLogin: async(parent, { userInput }, context, info) => {
       console.log(context.token);
       try {
-        // const exist = await userService.findUser(userInput.email);
-        // if (!exist) {
-        //   const error = new Error("존재하지 않는 회원입니다.");
-        //   error.status = 418;
-        //   throw error;
-        // }
-        // console.log(exist);
-        // const compare = await bcrypt.compare(userInput.password, exist.password);
-        // console.log(compare);
+        const exist = await userService.findUser(userInput.email);
+        if (!exist) {
+          const error = new Error("존재하지 않는 회원입니다.");
+          error.status = 418;
+          throw error;
+        }
+        console.log(exist);
+        const compare = await bcrypt.compare(userInput.password, exist.password);
+        console.log(compare);
       } catch (err) {
         console.error(err);
         throw err;
