@@ -10,8 +10,9 @@ import queries from "./typedefs-resolvers/queries.js";
 import mutations from "./typedefs-resolvers/mutations.js";
 import * as userResolver from "./typedefs-resolvers/user-resolver.js"; 
 import * as postResolver from "./typedefs-resolvers/post-resolver.js";
+import * as commentResolver from "./typedefs-resolvers/comment-resolver.js";
 
-import context from "./context/verify.js";
+import context from "./context/context.js";
 
 const app = express();
 
@@ -24,11 +25,13 @@ const typeDefs = [
   mutations,
   userResolver.resolverTypeDefs,
   postResolver.resolverTypeDefs,
+  commentResolver.resolverTypeDefs,
 ];
 
 const resolvers = [
   userResolver.resolver,
   postResolver.resolver,
+  commentResolver.resolver,
 ];
 
 const server = new ApolloServer({
@@ -36,7 +39,6 @@ const server = new ApolloServer({
   resolvers,
   cache: "bounded",
   path: "/graphql",
-  playGround: true,
   context,
   plugins: [
     ApolloServerPluginLandingPageLocalDefault,

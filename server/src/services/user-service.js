@@ -13,6 +13,7 @@ const findUser = async (email) => {
     return user;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 
@@ -25,6 +26,7 @@ const createUser = async (email, name, password) => {
     return user;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 
@@ -37,6 +39,7 @@ const createUserDetail = async (gender, address, userId) => {
     return detail;
   } catch (err) {
     console.error(err);
+    throw err;
   }
 };
 

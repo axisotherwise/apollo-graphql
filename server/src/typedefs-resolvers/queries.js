@@ -2,8 +2,9 @@ import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
   type Query {
-    getUsers: [User!]
-    getPosts: Posts!
+    getUsers: [Users!]
+    getPost: Post!
+    getPosts: [Posts!]
   }
 `;
 
