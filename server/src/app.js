@@ -39,6 +39,7 @@ const server = new ApolloServer({
   resolvers,
   cache: "bounded",
   path: "/graphql",
+  csrfPrevention: true,
   context,
   plugins: [
     ApolloServerPluginLandingPageLocalDefault,

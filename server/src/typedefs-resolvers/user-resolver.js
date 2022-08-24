@@ -7,13 +7,14 @@ import * as t from "../services/transaction-service.js";
 import * as jwt from "../modules/jwt.js";
 
 const resolverTypeDefs = gql`
-  type User {
-    id: ID
+  interface CommonUser {
+    user_id: Int
     email: String!
+    name: String!
   }
 
-  type Users {
-    id: ID
+  type User implements CommonUser {
+    user_id: Int!
     email: String!
     name: String!
     gender: String!
@@ -46,13 +47,15 @@ const resolverTypeDefs = gql`
 
 const resolver =  {
   Query: {
-    getUsers: async (parent, input, context) => {
+    getUsers: async (_, __, ___, ____) => {
+      try {
+        const users = await userService.getUsers();
 
-      return [
-        {
-          id: 1,
-        },
-      ];
+        return users;
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
     },
   },
   Mutation: {
@@ -90,15 +93,52 @@ const resolver =  {
         throw err;
       }
     },
+    findUser: async (_, { userInput }, context, __) => {
+      try { 
+        const [ exist ] = await userService.findUser(userInput.email);
+        if (exist.length <= 0) {
+          const error = new Error("존재하지 않는 유저입니다.");
+          error.status = 200;
+          throw error;
+        }
+        return [
+          {
+            id: exist.user_id,
+            email: exist.email,
+          }
+        ];
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    },
+    findUserDetail: async (_, { userInput }, context, __) => {
+      try {
+        const [ userDetail ] = await userService.findUserDetail(userInput.email);
+        return [
+          {
+            id: userDetail.idx,
+            email: userDetail.email,
+            name: userDetail.name,
+            gender: userDetail.gender,
+            address: userDetail.address,
+          }
+        ];
+      } catch (err) {
+        console.error(err);
+        err.stats = 500;
+        throw err;
+      }
+    },
     userLogin: async (_, { userInput }, context) => {
-      console.log(`context ${context}`);
       try {
         const [ exist ] = await userService.findUser(userInput.email);
         if (exist.length <= 0) {
-          const error = new Error("존재하지 않는 회원입니다.");
+          const error = new Error("존재하지 않는 유저입니다.");
           error.status = 418;
           throw error;
         }
+        console.log(exist);
         const compare = await bcrypt.compare(userInput.password, exist.password);
         if (!compare) {
           const error = new Error("비밀번호 불일치");

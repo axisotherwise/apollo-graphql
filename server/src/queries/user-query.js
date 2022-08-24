@@ -1,12 +1,38 @@
 const findUserQuery = `
-  SELECT *
-  FROM user
+  SELECT
+    U.user_id, U.email, U.name, U.password
+  FROM 
+    user AS U
   WHERE email = ?
 `;
 
-const getUserQuery = `
-  SELECT *
-  FROM user
+const findUserDetailQuery = `
+  SELECT
+    D.fk_user_id AS "idx", U.email, U.name,
+    D.gender, D.address
+  FROM
+    user AS U
+  RIGHT JOIN 
+    (
+      SELECT D.gender, D.address, D.created_at, D.fk_user_id
+      FROM detail AS D
+    ) D
+  ON U.user_id = D.fk_user_id
+  WHERE email = ?
+`;
+
+const getUsers = `
+  SELECT
+    U.user_id, U.email, U.name,
+    D.gender, D.address
+  FROM
+    user AS U
+  LEFT JOIN 
+    (
+      SELECT D.gender, D.address, D.created_at, D.fk_user_id
+      FROM detail AS D
+    ) D
+  ON U.user_id = D.fk_user_id
 `;
 
 const createUserQuery = `
@@ -27,7 +53,8 @@ const createUserDetailQuery = `
 
 export {
   findUserQuery,
-  getUserQuery,
+  findUserDetailQuery,
+  getUsers,
   createUserQuery,
   createUserDetailQuery,
 };

@@ -17,6 +17,31 @@ const findUser = async (email) => {
   }
 };
 
+const findUserDetail = async (email) => {
+  try {
+    const [ userDetail ] = await conn.query(
+      userQuery.findUserDetailQuery,
+      [ email ]
+    );
+    return userDetail;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const getUsers = async () => {
+  try {
+    const [ users ] = await conn.query(
+      userQuery.getUsers
+    );
+    return users;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 const createUser = async (email, name, password) => {
   try {
     const [ user ] = await conn.query(
@@ -46,6 +71,8 @@ const createUserDetail = async (gender, address, userId) => {
 
 export {
   findUser,
+  findUserDetail,
+  getUsers,
   createUser,
   createUserDetail,
 };

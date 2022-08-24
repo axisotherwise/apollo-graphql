@@ -72,10 +72,10 @@ const resolver = {
             writer: e.fk_user_email,
           });
         }
-        return {
+        return [
           content,
           comments,
-        };
+        ];
       } catch (err) {
         console.error(err);
         throw err;

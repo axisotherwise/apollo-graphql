@@ -1,10 +1,14 @@
 const readPost = `
   SELECT 
-    P.post_id, P.title, P.content, P.fk_user_email, P.image
+    P.post_id, P.title, P.content, P.fk_user_email, P.image,
+    U.email, U.name
   FROM 
     post P
-  JOIN user U
-    ON P.fk_user_email = U.email
+  INNER JOIN user U
+  ON P.fk_user_email = U.email
+  RIGHT JOIN comment C
+  ON P.post_id = C.fk_post_id
+  WHERE P.post_id = ?
 `;
 
 const readPosts = `
@@ -26,21 +30,21 @@ const readPosts = `
         U.email, U.user_id 
       FROM user U
     ) U
-        ON P.fk_user_email = U.email
+  ON P.fk_user_email = U.email
   LEFT JOIN
     (
       SELECT 
         D.fk_user_id, D.gender, D.address 
       FROM detail D
     ) D 
-        ON U.user_id = D.fk_user_id
+  ON U.user_id = D.fk_user_id
   LEFT JOIN
     (
       SELECT 
         C.comment_id, C.comment, C.fk_user_email, C.fk_post_id 
       FROM comment C
     ) C
-        ON C.fk_post_id = P.post_id
+  ON C.fk_post_id = P.post_id
   LEFT JOIN
     (
       SELECT 
@@ -48,14 +52,14 @@ const readPosts = `
       FROM 
         user UC
     ) UC
-        ON UC.email = C.fk_user_email
+  ON UC.email = C.fk_user_email
   LEFT JOIN
     (
       SELECT
         DC.gender, DC.address, DC.fk_user_id
       FROM detail DC
     ) DC
-        ON DC.fk_user_id = UC.user_id
+  ON DC.fk_user_id = UC.user_id
 `;
 
 const createPost = `
